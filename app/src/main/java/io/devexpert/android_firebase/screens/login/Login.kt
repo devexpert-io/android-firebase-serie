@@ -28,17 +28,27 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.logEvent
+import io.devexpert.android_firebase.navigation.trackScreen
 import io.devexpert.android_firebase.ui.theme.Purple40
 
 @Composable
-fun Login(navigateToHome: () -> Unit) {
+fun Login(analytics: FirebaseAnalytics, navigateToHome: () -> Unit) {
+    trackScreen(name = "Ingreso a LoginScreen", analytics = analytics)
+
     Box(modifier = Modifier.fillMaxSize()) {
         ClickableText(
             text = AnnotatedString("¿No tienes una cuenta? Regístrate"),
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(50.dp),
-            onClick = {},
+            onClick = {
+                      analytics.logEvent("configuracion") {
+                          param("valor1", "No tiene cuenta")
+                          param("valor2", "Registro de nuevo usuario")
+                      }
+            },
             style = TextStyle(
                 fontSize = 14.sp,
                 fontFamily = FontFamily.Default,
@@ -92,7 +102,11 @@ fun Login(navigateToHome: () -> Unit) {
         Spacer(modifier = Modifier.height(40.dp))
         ClickableText(
             text = AnnotatedString("¿Olvidaste tu contraseña?"),
-            onClick = {},
+            onClick = {
+                analytics.logEvent("usuario_error") {
+                    param("valor1", "Olvido contraseña")
+                }
+            },
             style = TextStyle(
                 fontSize = 14.sp,
                 fontFamily = FontFamily.Default,
