@@ -1,4 +1,4 @@
-package io.devexpert.android_firebase.screens
+package io.devexpert.android_firebase.ui.screens
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
