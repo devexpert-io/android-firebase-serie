@@ -56,16 +56,22 @@ import io.devexpert.android_firebase.ui.navigation.Routes
 import io.devexpert.android_firebase.ui.screens.login.ContactsScreen
 import io.devexpert.android_firebase.ui.screens.login.NotesScreen
 import io.devexpert.android_firebase.utils.AnalyticsManager
+import io.devexpert.android_firebase.utils.AuthManager
 
 @Composable
-fun HomeScreen(analytics: AnalyticsManager, navigation: NavController) {
+fun HomeScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavController) {
     analytics.logScreenView(screenName = Routes.Home.route)
     val navController = rememberNavController()
 
     var showDialog by remember { mutableStateOf(false) }
 
     val onLogoutConfirmed: () -> Unit = {
-
+        auth.signOut()
+        navigation.navigate(Routes.Login.route) {
+            popUpTo(Routes.Home.route) {
+                inclusive = true
+            }
+        }
     }
 
     Scaffold (

@@ -1,5 +1,6 @@
 package io.devexpert.android_firebase.ui.screens.auth
 
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -26,10 +27,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -44,16 +47,18 @@ import io.devexpert.android_firebase.R
 import io.devexpert.android_firebase.ui.navigation.Routes
 import io.devexpert.android_firebase.ui.theme.Purple40
 import io.devexpert.android_firebase.utils.AnalyticsManager
+import io.devexpert.android_firebase.utils.AuthManager
+import io.devexpert.android_firebase.utils.AuthRes
+import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(analytics: AnalyticsManager, navigation: NavController) {
+fun LoginScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavController) {
     analytics.logScreenView(screenName = Routes.Login.route)
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-
-
-
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -136,7 +141,9 @@ fun LoginScreen(analytics: AnalyticsManager, navigation: NavController) {
         Spacer(modifier = Modifier.height(25.dp))
         SocialMediaButton(
             onClick = {
-
+                scope.launch{
+                    incognitoSignIn(auth, analytics, context, navigation)
+                }
             },
             text = "Continuar como invitado",
             icon = R.drawable.ic_incognito,
@@ -154,7 +161,21 @@ fun LoginScreen(analytics: AnalyticsManager, navigation: NavController) {
     }
 }
 
-
+private suspend fun incognitoSignIn(auth: AuthManager, analytics: AnalyticsManager, context: Context, navigation: NavController) {
+    when(val result = auth.signInAnonymously()) {
+        is AuthRes.Success -> {
+            analytics.logButtonClicked("Click: Continuar como invitado")
+            navigation.navigate(Routes.Home.route) {
+                popUpTo(Routes.Login.route) {
+                    inclusive = true
+                }
+            }
+        }
+        is AuthRes.Error -> {
+            analytics.logError("Error SignIn Incognito: ${result.errorMessage}")
+        }
+    }
+}
 
 @Composable
 fun SocialMediaButton(onClick: () -> Unit, text: String, icon: Int, color: Color, ) {
