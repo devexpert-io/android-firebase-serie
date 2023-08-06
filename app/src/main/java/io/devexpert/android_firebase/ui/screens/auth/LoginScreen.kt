@@ -60,7 +60,6 @@ fun LoginScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavC
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-
     Box(modifier = Modifier.fillMaxSize()) {
         ClickableText(
             text = AnnotatedString("¿No tienes una cuenta? Regístrate"),
