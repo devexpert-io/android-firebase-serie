@@ -63,6 +63,8 @@ fun HomeScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavCo
     analytics.logScreenView(screenName = Routes.Home.route)
     val navController = rememberNavController()
 
+    val user = auth.getCurrentUser()
+
     var showDialog by remember { mutableStateOf(false) }
 
     val onLogoutConfirmed: () -> Unit = {
@@ -82,18 +84,28 @@ fun HomeScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavCo
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        if(user?.photoUrl != null) {
 
-
+                        } else {
+                            Image(
+                                painter = painterResource(R.drawable.profile),
+                                contentDescription = "Foto de perfil por defecto",
+                                modifier = Modifier
+                                    .padding(end = 8.dp)
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                            )
+                        }
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = "Bienvenidx",
+                                text = if(!user?.displayName.isNullOrEmpty()) "Hola ${user?.displayName}" else "Bienvenidx",
                                 fontSize = 20.sp,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
                             Text(
-                                text = "Usuario",
+                                text = if(!user?.email.isNullOrEmpty()) "${user?.email}" else "Anónimo",
                                 fontSize = 12.sp,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis)

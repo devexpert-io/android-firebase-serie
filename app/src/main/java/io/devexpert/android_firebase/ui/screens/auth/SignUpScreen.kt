@@ -1,5 +1,7 @@
 package io.devexpert.android_firebase.ui.screens.auth
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,12 +34,16 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.firebase.analytics.FirebaseAnalytics
 import io.devexpert.android_firebase.ui.navigation.Routes
 import io.devexpert.android_firebase.ui.theme.Purple40
 import io.devexpert.android_firebase.utils.AnalyticsManager
+import io.devexpert.android_firebase.utils.AuthManager
+import io.devexpert.android_firebase.utils.AuthRes
+import kotlinx.coroutines.launch
 
 @Composable
-fun SignUpScreen(analytics: AnalyticsManager, navigation: NavController) {
+fun SignUpScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavController) {
     analytics.logScreenView(screenName = Routes.SignUp.route)
 
     val context = LocalContext.current
@@ -74,7 +80,9 @@ fun SignUpScreen(analytics: AnalyticsManager, navigation: NavController) {
         Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
             Button(
                 onClick = {
-
+                    scope.launch {
+                        signUp(email, password, auth, analytics, context, navigation)
+                    }
                 },
                 shape = RoundedCornerShape(50.dp),
                 modifier = Modifier
@@ -100,3 +108,44 @@ fun SignUpScreen(analytics: AnalyticsManager, navigation: NavController) {
         )
     }
 }
+
+private suspend fun signUp(email: String, password: String, auth: AuthManager, analytics: AnalyticsManager, context: Context, navigation: NavController) {
+    if(email.isNotEmpty() && password.isNotEmpty()) {
+        when(val result = auth.createUserWithEmailAndPassword(email, password)) {
+            is AuthRes.Success -> {
+                analytics.logButtonClicked(FirebaseAnalytics.Event.SIGN_UP)
+                Toast.makeText(context, "Registro exitoso", Toast.LENGTH_SHORT).show()
+                navigation.popBackStack()
+            }
+            is AuthRes.Error -> {
+                analytics.logButtonClicked("Error SignUp: ${result.errorMessage}")
+                Toast.makeText(context, "Error SignUp: ${result.errorMessage}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    } else {
+        Toast.makeText(context, "Existen campos vacios", Toast.LENGTH_SHORT).show()
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

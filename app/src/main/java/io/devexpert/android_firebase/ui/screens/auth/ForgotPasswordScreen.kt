@@ -1,5 +1,6 @@
 package io.devexpert.android_firebase.ui.screens.auth
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,9 +31,12 @@ import androidx.navigation.NavController
 import io.devexpert.android_firebase.ui.navigation.Routes
 import io.devexpert.android_firebase.ui.theme.Purple40
 import io.devexpert.android_firebase.utils.AnalyticsManager
+import io.devexpert.android_firebase.utils.AuthManager
+import io.devexpert.android_firebase.utils.AuthRes
+import kotlinx.coroutines.launch
 
 @Composable
-fun ForgotPasswordScreen(analytics: AnalyticsManager, navigation: NavController) {
+fun ForgotPasswordScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavController) {
     analytics.logScreenView(screenName = Routes.ForgotPassword.route)
 
     val context = LocalContext.current
@@ -60,7 +64,19 @@ fun ForgotPasswordScreen(analytics: AnalyticsManager, navigation: NavController)
         Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
             Button(
                 onClick = {
-
+                    scope.launch {
+                        when(val res = auth.resetPassword(email)) {
+                            is AuthRes.Success -> {
+                                analytics.logButtonClicked(buttonName = "Reset password $email")
+                                Toast.makeText(context, "Correo enviado", Toast.LENGTH_SHORT).show()
+                                navigation.navigate(Routes.Login.route)
+                            }
+                            is AuthRes.Error -> {
+                                analytics.logError(error = "Reset password error $email : ${res.errorMessage}")
+                                Toast.makeText(context, "Error al enviar el correo", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
                 },
                 shape = RoundedCornerShape(50.dp),
                 modifier = Modifier

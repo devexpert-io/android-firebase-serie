@@ -43,12 +43,14 @@ fun Navigation(context: Context, navController: NavHostController = rememberNavC
             composable(Routes.SignUp.route) {
                 SignUpScreen(
                     analytics = analytics,
+                    auth = authManager,
                     navigation = navController
                 )
             }
             composable(Routes.ForgotPassword.route) {
                 ForgotPasswordScreen(
                     analytics = analytics,
+                    auth = authManager,
                     navigation = navController
                 )
             }

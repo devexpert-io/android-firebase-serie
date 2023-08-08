@@ -23,6 +23,35 @@ class AuthManager {
         }
     }
 
+
+
+    suspend fun createUserWithEmailAndPassword(email: String, password: String): AuthRes<FirebaseUser?> {
+        return try {
+            val authResult = auth.createUserWithEmailAndPassword(email, password).await()
+            AuthRes.Success(authResult.user)
+        } catch(e: Exception) {
+            AuthRes.Error(e.message ?: "Error al crear el usuario")
+        }
+    }
+
+    suspend fun signInWithEmailAndPassword(email: String, password: String): AuthRes<FirebaseUser?> {
+        return try {
+            val authResult = auth.signInWithEmailAndPassword(email, password).await()
+            AuthRes.Success(authResult.user)
+        } catch(e: Exception) {
+            AuthRes.Error(e.message ?: "Error al iniciar sesión")
+        }
+    }
+
+    suspend fun resetPassword(email: String): AuthRes<Unit> {
+        return try {
+            auth.sendPasswordResetEmail(email).await()
+            AuthRes.Success(Unit)
+        } catch(e: Exception) {
+            AuthRes.Error(e.message ?: "Error al restablecer la contraseña")
+        }
+    }
+
     fun signOut() {
         auth.signOut()
     }
