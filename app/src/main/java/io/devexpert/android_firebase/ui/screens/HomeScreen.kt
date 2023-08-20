@@ -85,7 +85,17 @@ fun HomeScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavCo
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         if(user?.photoUrl != null) {
-
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(user?.photoUrl)
+                                    .crossfade(true)
+                                    .build(),
+                                contentDescription = "Imagen",
+                                placeholder = painterResource(id = R.drawable.profile),
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .size(40.dp))
                         } else {
                             Image(
                                 painter = painterResource(R.drawable.profile),

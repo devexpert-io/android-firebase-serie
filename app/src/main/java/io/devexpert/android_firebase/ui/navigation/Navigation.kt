@@ -18,7 +18,7 @@ import io.devexpert.android_firebase.utils.AuthManager
 @Composable
 fun Navigation(context: Context, navController: NavHostController = rememberNavController()) {
     var analytics: AnalyticsManager = AnalyticsManager(context)
-    val authManager: AuthManager = AuthManager()
+    val authManager: AuthManager = AuthManager(context)
 
     val user: FirebaseUser? = authManager.getCurrentUser()
 
