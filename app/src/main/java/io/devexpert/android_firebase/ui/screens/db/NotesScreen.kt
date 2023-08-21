@@ -50,8 +50,10 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun NotesScreen() {
+fun NotesScreen(firestore: FirestoreManager) {
     var showAddNoteDialog by remember { mutableStateOf(false) }
+
+    val notes by firestore.getNotesFlow().collectAsState(emptyList())
 
     val scope = rememberCoroutineScope()
 
@@ -67,19 +69,26 @@ fun NotesScreen() {
             if (showAddNoteDialog) {
                 AddNoteDialog(
                     onNoteAdded = { note ->
-
+                        scope.launch {
+                            firestore.addNote(note)
+                        }
+                        showAddNoteDialog = false
                     },
                     onDialogDismissed = { showAddNoteDialog = false },
                 )
             }
         }
     ) {
-        if(true) {
+        if(!notes.isNullOrEmpty()) {
             LazyVerticalStaggeredGrid(
                 columns = StaggeredGridCells.Fixed(2),
                 contentPadding = PaddingValues(4.dp)
             ) {
-
+                notes.forEach {
+                    item {
+                        NoteItem(note = it, firestore = firestore)
+                    }
+                }
             }
         } else{
             Column(
@@ -100,11 +109,13 @@ fun NotesScreen() {
 }
 
 @Composable
-fun NoteItem(note: Note, firestore: FirestoreManager, onDeleteClick: () -> Unit) {
+fun NoteItem(note: Note, firestore: FirestoreManager) {
     var showDeleteNoteDialog by remember { mutableStateOf(false) }
 
     val onDeleteNoteConfirmed: () -> Unit = {
-
+        CoroutineScope(Dispatchers.Default).launch {
+            firestore.deleteNote(note.id ?: "")
+        }
     }
 
     if (showDeleteNoteDialog) {
@@ -127,11 +138,11 @@ fun NoteItem(note: Note, firestore: FirestoreManager, onDeleteClick: () -> Unit)
                 .padding(12.dp)
                 .fillMaxWidth()
         ) {
-            Text(text = "",
+            Text(text = note.title,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "",
+            Text(text = note.content,
                 fontWeight = FontWeight.Thin,
                 fontSize = 13.sp,
                 lineHeight = 15.sp)
@@ -156,7 +167,12 @@ fun AddNoteDialog(onNoteAdded: (Note) -> Unit, onDialogDismissed: () -> Unit) {
         confirmButton = {
             Button(
                 onClick = {
-
+                    val newNote = Note(
+                        title = title,
+                        content = content)
+                    onNoteAdded(newNote)
+                    title = ""
+                    content = ""
                 }
             ) {
                 Text(text = "Agregar")
