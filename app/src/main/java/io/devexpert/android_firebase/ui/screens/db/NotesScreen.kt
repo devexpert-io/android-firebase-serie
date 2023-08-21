@@ -1,4 +1,4 @@
-package io.devexpert.android_firebase.ui.screens.login
+package io.devexpert.android_firebase.ui.screens.db
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
