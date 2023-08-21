@@ -29,6 +29,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,8 +49,10 @@ import io.devexpert.android_firebase.utils.RealtimeManager
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ContactsScreen() {
+fun ContactsScreen(realtime: RealtimeManager, authManager: AuthManager) {
     var showAddContactDialog by remember { mutableStateOf(false) }
+
+    val contacts by realtime.getContactsFlow().collectAsState(emptyList())
 
     Scaffold(
         floatingActionButton = {
@@ -62,13 +65,24 @@ fun ContactsScreen() {
             }
 
             if (showAddContactDialog) {
-
+                AddContactDialog(
+                    onContactAdded = { contact ->
+                        realtime.addContact(contact)
+                        showAddContactDialog = false
+                    },
+                    onDialogDismissed = { showAddContactDialog = false },
+                    authManager = authManager,
+                )
             }
         }
     ) { _  ->
-        if(true) {
+        if(!contacts.isNullOrEmpty()) {
             LazyColumn {
-
+                contacts.forEach { contact ->
+                    item {
+                        ContactItem(contact = contact, realtime = realtime)
+                    }
+                }
             }
         } else {
             Column(
@@ -92,7 +106,7 @@ fun ContactItem(contact: Contact, realtime: RealtimeManager) {
     var showDeleteContactDialog by remember { mutableStateOf(false) }
 
     val onDeleteContactConfirmed: () -> Unit = {
-
+        realtime.deleteContact(contact.key ?: "")
     }
 
     if (showDeleteContactDialog) {
@@ -121,21 +135,21 @@ fun ContactItem(contact: Contact, realtime: RealtimeManager) {
         ) {
             Column(modifier = Modifier.weight(3f)) {
                 Text(
-                    text = "",
+                    text = contact.name,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis)
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "",
+                    text = contact.phoneNumber,
                     fontWeight = FontWeight.Medium,
                     fontSize = 15.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis)
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "",
+                    text = contact.email,
                     fontWeight = FontWeight.Thin,
                     fontSize = 12.sp,
                     maxLines = 1,
@@ -170,7 +184,15 @@ fun AddContactDialog(onContactAdded: (Contact) -> Unit, onDialogDismissed: () ->
         confirmButton = {
             Button(
                 onClick = {
-
+                    val newContact = Contact(
+                        name = name,
+                        phoneNumber = phoneNumber,
+                        email = email,
+                        uid = uid.toString())
+                    onContactAdded(newContact)
+                    name = ""
+                    phoneNumber = ""
+                    email = ""
                 }
             ) {
                 Text(text = "Agregar")
