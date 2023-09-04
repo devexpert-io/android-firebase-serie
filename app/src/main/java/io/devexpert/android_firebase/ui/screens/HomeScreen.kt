@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.ExitToApp
@@ -55,6 +57,7 @@ import io.devexpert.android_firebase.R
 import io.devexpert.android_firebase.ui.navigation.Routes
 import io.devexpert.android_firebase.ui.screens.db.ContactsScreen
 import io.devexpert.android_firebase.ui.screens.db.NotesScreen
+import io.devexpert.android_firebase.ui.screens.storage.CloudStorageScreen
 import io.devexpert.android_firebase.utils.AnalyticsManager
 import io.devexpert.android_firebase.utils.AuthManager
 import io.devexpert.android_firebase.utils.FirestoreManager
@@ -181,7 +184,8 @@ fun LogoutDialog(onConfirmLogout: () -> Unit, onDismiss: () -> Unit) {
 fun BottomBar(navController: NavHostController) {
     val screens = listOf(
         BottomNavScreen.Contact,
-        BottomNavScreen.Note
+        BottomNavScreen.Note,
+        BottomNavScreen.Photos
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -226,6 +230,9 @@ fun BottomNavGraph(navController: NavHostController, context: Context, authManag
         composable(route = BottomNavScreen.Note.route) {
             NotesScreen(firestore = firestore)
         }
+        composable(route = BottomNavScreen.Photos.route) {
+            CloudStorageScreen()
+        }
     }
 }
 
@@ -239,5 +246,10 @@ sealed class BottomNavScreen(val route: String, val title: String, val icon: Ima
         route = "notes",
         title = "Notas",
         icon = Icons.Default.List
+    )
+    object Photos : BottomNavScreen(
+        route = "photos",
+        title = "Photos",
+        icon = Icons.Default.Face
     )
 }
