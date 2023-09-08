@@ -60,6 +60,7 @@ import io.devexpert.android_firebase.ui.screens.db.NotesScreen
 import io.devexpert.android_firebase.ui.screens.storage.CloudStorageScreen
 import io.devexpert.android_firebase.utils.AnalyticsManager
 import io.devexpert.android_firebase.utils.AuthManager
+import io.devexpert.android_firebase.utils.CloudStorageManager
 import io.devexpert.android_firebase.utils.FirestoreManager
 import io.devexpert.android_firebase.utils.RealtimeManager
 
@@ -223,6 +224,7 @@ fun RowScope.AddItem(screens: BottomNavScreen, currentDestination: NavDestinatio
 fun BottomNavGraph(navController: NavHostController, context: Context, authManager: AuthManager) {
     val realtime = RealtimeManager(context)
     val firestore = FirestoreManager(context)
+    val storage = CloudStorageManager(context)
     NavHost(navController = navController, startDestination = BottomNavScreen.Contact.route) {
         composable(route = BottomNavScreen.Contact.route) {
             ContactsScreen(realtime = realtime, authManager = authManager)
@@ -231,7 +233,7 @@ fun BottomNavGraph(navController: NavHostController, context: Context, authManag
             NotesScreen(firestore = firestore)
         }
         composable(route = BottomNavScreen.Photos.route) {
-            CloudStorageScreen()
+            CloudStorageScreen(storage = storage)
         }
     }
 }
