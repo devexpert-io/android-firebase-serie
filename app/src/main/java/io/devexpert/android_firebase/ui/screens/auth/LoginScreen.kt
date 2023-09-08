@@ -192,6 +192,19 @@ fun LoginScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavC
             icon = R.drawable.ic_google,
             color = Color(0xFFF1F1F1)
         )
+        Spacer(modifier = Modifier.height(25.dp))
+        ClickableText(
+            text = AnnotatedString("Forzar cierre Crashlytics"),
+            onClick = {
+
+            },
+            style = TextStyle(
+                fontSize = 14.sp,
+                fontFamily = FontFamily.Default,
+                textDecoration = TextDecoration.Underline,
+                color = Purple40
+            )
+        )
     }
 }
 
