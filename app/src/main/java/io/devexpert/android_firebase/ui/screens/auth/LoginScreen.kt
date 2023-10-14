@@ -49,6 +49,7 @@ import androidx.navigation.NavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import io.devexpert.android_firebase.R
 import io.devexpert.android_firebase.ui.navigation.Routes
 import io.devexpert.android_firebase.ui.theme.Purple40
@@ -56,6 +57,7 @@ import io.devexpert.android_firebase.utils.AnalyticsManager
 import io.devexpert.android_firebase.utils.AuthManager
 import io.devexpert.android_firebase.utils.AuthRes
 import kotlinx.coroutines.launch
+import java.lang.RuntimeException
 
 @Composable
 fun LoginScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavController) {
@@ -196,7 +198,11 @@ fun LoginScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavC
         ClickableText(
             text = AnnotatedString("Forzar cierre Crashlytics"),
             onClick = {
+                val crashlytics = FirebaseCrashlytics.getInstance()
+                crashlytics.setCustomKey("pruebaClave", "valor de la prueba clave")
+                crashlytics.log("Mensaje personalizado desde un log")
 
+                throw RuntimeException("Error forzado desde LoginScreen")
             },
             style = TextStyle(
                 fontSize = 14.sp,

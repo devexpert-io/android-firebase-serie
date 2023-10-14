@@ -55,6 +55,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.crashlytics.ktx.setCustomKeys
 import io.devexpert.android_firebase.R
 import io.devexpert.android_firebase.ui.navigation.Routes
 import io.devexpert.android_firebase.ui.screens.db.ContactsScreen
@@ -65,6 +67,7 @@ import io.devexpert.android_firebase.utils.AuthManager
 import io.devexpert.android_firebase.utils.CloudStorageManager
 import io.devexpert.android_firebase.utils.FirestoreManager
 import io.devexpert.android_firebase.utils.RealtimeManager
+import java.lang.RuntimeException
 
 @Composable
 fun HomeScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavController) {
@@ -136,7 +139,20 @@ fun HomeScreen(analytics: AnalyticsManager, auth: AuthManager, navigation: NavCo
                 actions = {
                     IconButton(
                         onClick = {
+                            val crashlytics = FirebaseCrashlytics.getInstance()
+                            crashlytics.setCustomKey("pruebaClaveHome", "Valor a enviar")
+                            crashlytics.log("Mensaje log desde HomeScreen")
+                            crashlytics.setUserId(user?.uid ?: "No Id Found")
+                            crashlytics.setCustomKeys {
+                                key("str", "hello")
+                                key("bool", true)
+                                key("int", 5)
+                                key("long", 5.8)
+                                key("float", 1.0f)
+                                key("double", 1.0)
+                            }
 
+                            throw RuntimeException("Error forzado desde HomeScreen")
                         }
                     ) {
                         Icon(Icons.Default.Warning , contentDescription = "Forzar Error")
