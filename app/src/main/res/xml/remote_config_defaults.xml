@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<defaultsMap>
+    <entry>
+        <key>welcome_message</key>
+        <value>| Firebase App</value>
+    </entry>
+    <entry>
+        <key>is_button_visible</key>
+        <value>true</value>
+    </entry>
+</defaultsMap>
